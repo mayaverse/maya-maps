@@ -1,14 +1,15 @@
-import { PixiRef, Stage } from '@inlet/react-pixi';
-import React, { useMemo, useRef } from 'react';
+import { Container, PixiRef, Stage } from '@inlet/react-pixi';
+import { IApplicationOptions } from '@pixi/app';
+import React, { useRef } from 'react';
 
 import { useHexGrid } from '../../lib/hooks/useHexGrid';
 import useResize from '../../lib/hooks/useResize';
-import Hexagon from './Hexagon';
+import HexagonTile from './HexagonTile';
 import PixiViewport from './PixiViewport';
 
 type IPixiViewport = PixiRef<typeof PixiViewport>;
 
-const stageOptions = {
+const stageOptions: IApplicationOptions = {
   antialias: true,
   autoDensity: true,
   backgroundColor: 0xefefef,
@@ -33,9 +34,11 @@ const HexMap = () => {
         worldWidth={width * 4}
         worldHeight={height * 4}
       >
-        {grid?.hexes().map(node => (
-          <Hexagon key={node.toString()} color={0x999999} corners={node.corners} visibility={node.visibility} />
-        ))}
+        <Container sortableChildren>
+          {grid?.hexes().map((node) => (
+            <HexagonTile key={node.toString()} node={node} />
+          ))}
+        </Container>
       </PixiViewport>
     </Stage>
   );

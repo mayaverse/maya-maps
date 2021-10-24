@@ -19,9 +19,9 @@ const Grid: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <HexGridProvider
-        dimensions={30}
+        dimensions={{ height: 50, width: 50 }}
         offset={0}
-        orientation={Orientation.FLAT}
+        orientation={Orientation.POINTY}
         origin={'topLeft'}
         viewDistance={3}
         contour={[0.2, 0.3, 0.5, 0.7, 0.9]}

@@ -8,7 +8,7 @@ export interface IElevationSettings {
   octave3: number;
   createIsland: boolean;
 }
-/* 
+/* /* 
 export function proceduralElevation(settings) {
     const simplex = new SimplexNoise(settings.elevationSeed);
     let elevation = [[]];
