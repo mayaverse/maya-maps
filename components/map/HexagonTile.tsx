@@ -2,7 +2,6 @@ import { hexToPoint } from 'honeycomb-grid';
 import React from 'react';
 
 import { Node } from '../../lib/grid/node';
-import CoordinatesLog from './CoordinatesLog';
 import Hexagon from './Hexagon';
 import { AdaptiveIsometricTerrainSprite } from './IsometricTerrainSprite';
 import { MountainTopSmallSnow } from './SmallTerrainDetailSprite';
@@ -36,7 +35,7 @@ const HexagonTile = ({ node }: HexagonTileProps) => {
           )}
         </>
       )}
-      <CoordinatesLog center={point} col={node.q} row={node.r} />
+      {/* <CoordinatesLog center={point} col={node.q} row={node.r} /> */}
     </Hexagon>
   );
 };

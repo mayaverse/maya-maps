@@ -1,5 +1,14 @@
 import { PixiComponent, useApp } from '@inlet/react-pixi';
-import { IDecelerateOptions, IDragOptions, IPinchOptions, IViewportOptions, IWheelOptions, Viewport } from 'pixi-viewport';
+import {
+  IClampOptions,
+  IClampZoomOptions,
+  IDecelerateOptions,
+  IDragOptions,
+  IPinchOptions,
+  IViewportOptions,
+  IWheelOptions,
+  Viewport,
+} from 'pixi-viewport';
 import { Application } from 'pixi.js';
 import { forwardRef, ReactNode } from 'react';
 
@@ -14,6 +23,8 @@ interface PixieViewportProps extends IViewportOptions {
   app: Application;
   plugins?: ViewportPlugins;
   children?: ReactNode;
+  clamp: IClampOptions;
+  clampZoom: IClampZoomOptions;
 }
 
 type ViewportProps = Pick<
@@ -25,7 +36,7 @@ const PixiViewportComponent = PixiComponent<PixieViewportProps, Viewport>(
   'Viewport',
   {
     create(props) {
-      const { app, plugins, ...viewportProps } = props;
+      const { app, plugins, clamp, clampZoom, ...viewportProps } = props;
 
       const viewport = new Viewport({
         ticker: app.ticker,
@@ -46,17 +57,24 @@ const PixiViewportComponent = PixiComponent<PixieViewportProps, Viewport>(
         });
       }
 
+      viewport.clamp(clamp);
+      viewport.clampZoom(clampZoom);
+
       return viewport;
     },
     applyProps(viewport, _oldProps, _newProps) {
       const {
         plugins: oldPlugins,
         children: oldChildren,
+        clamp: oldClamp,
+        clampZoom: oldClampZ,
         ...oldProps
       } = _oldProps;
       const {
         plugins: newPlugins,
         children: newChildren,
+        clamp: newClamp,
+        clampZoom: newClampZ,
         ...newProps
       } = _newProps;
 
@@ -67,9 +85,13 @@ const PixiViewportComponent = PixiComponent<PixieViewportProps, Viewport>(
           viewport[p] = newProps[p] || 0;
         }
       });
+      if (oldClamp !== newClamp) {
+        viewport.clamp(newClamp);
+      }
     },
-    didMount() {
+    didMount(viewport) {
       console.log('viewport mounted');
+      viewport.moveCenter(0, 0);
     },
   }
 );

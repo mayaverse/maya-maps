@@ -22,6 +22,7 @@ export interface IGridSettings extends HexPrototypeOptions {
   elevation: IElevationSettings;
   moisture: IMoistureSettings;
   contour: FixedLengthArray<number, 5>;
+  size: number;
 }
 
 export interface IGrid {
@@ -29,6 +30,7 @@ export interface IGrid {
   elevationSettings: IElevationSettings;
   moistureSettings: IMoistureSettings;
   contourSettings: FixedLengthArray<number, 5>;
+  size: number;
 }
 
 export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
@@ -37,17 +39,19 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
   readonly moistureSettings: IMoistureSettings;
   readonly contourSettings: FixedLengthArray<number, 5>;
   private readonly elevationNoise: SimplexNoise;
-  private readonly qtyHexesX: number;
-  private readonly qtyHexesY: number;
+  readonly qtyHexesX: number;
+  readonly qtyHexesY: number;
+  readonly size: number;
 
   constructor(settings: IGridSettings) {
     const hexPrototype = createHexPrototype<N>({
       ...settings,
       visibility: 'undiscovered',
     });
-    const transverser = spiral<N>({ start: [0, 0], radius: 20 });
+    const transverser = spiral<N>({ start: [0, 0], radius: settings.size });
     super(hexPrototype, transverser);
 
+    this.size = settings.size;
     this.qtyHexesX = (settings.dimensions as BoundingBox).width * 2 + 1;
     this.qtyHexesY = (settings.dimensions as BoundingBox).height * 2 + 1;
     this.viewDistance = settings.viewDistance;
@@ -133,6 +137,7 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
 
 export function generateGrid(settings?: Partial<IGridSettings>): HexGrid<Node> {
   const defaultSettings: IGridSettings = {
+    size: 20,
     viewDistance: 3,
     dimensions: { height: 50, width: 50 },
     orientation: Orientation.FLAT,
@@ -141,7 +146,7 @@ export function generateGrid(settings?: Partial<IGridSettings>): HexGrid<Node> {
     contour: [0.2, 0.3, 0.5, 0.7, 0.9],
     elevation: {
       createIsland: false,
-      seed: 'fdc9a9ca516c78d1f830948badf1875d88424407',
+      seed: 'adc9a9ca51217841f830942badf1675d8s424415',
       frequency: 0.8,
       redistribution: 1.0,
       octave0: 1,

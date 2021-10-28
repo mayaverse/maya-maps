@@ -4,7 +4,7 @@ import {
   EmitterConfigV3,
   upgradeConfig,
 } from '@pixi/particle-emitter';
-import { Container, Texture } from 'pixi.js';
+import { Container, MaskData, Texture } from 'pixi.js';
 
 import defaultConfig from './smoke-emitter.json';
 
@@ -15,6 +15,7 @@ const dc = upgradeConfig(defaultConfig, [
 
 interface SmokeEmitterProps extends Partial<EmitterConfigV3> {
   play: boolean;
+  mask?: Container | MaskData | null;
 }
 
 class EmitContainer extends Container {
@@ -33,6 +34,9 @@ const SmokeEmitter = PixiComponent<SmokeEmitterProps, EmitContainer>(
     applyProps(instance, oldProps, newProps) {
       const { emitter } = instance;
       if (emitter) {
+        if (newProps.mask) {
+          instance.mask = newProps.mask;
+        }
         let elapsed = Date.now();
 
         const update = () => {
