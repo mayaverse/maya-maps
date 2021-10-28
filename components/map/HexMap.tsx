@@ -34,6 +34,7 @@ const HexMap = () => {
         worldWidth={width * 4}
         worldHeight={height * 4}
       >
+        {/* <SmokeEmitter play /> */}
         <Container sortableChildren>
           {grid?.hexes().map((node) => (
             <HexagonTile key={node.toString()} node={node} />

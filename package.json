@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@inlet/react-pixi": "^6.6.5",
+    "@pixi/particle-emitter": "^5.0.2",
     "honeycomb-grid": "git+https://github.com/mayaverse/honeycomb.git#without-husky",
     "next": "11.1.2",
     "pixi-viewport": "^4.32.0",

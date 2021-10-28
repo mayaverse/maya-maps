@@ -326,6 +326,11 @@
   resolved "https://registry.yarnpkg.com/@pixi/particle-container/-/particle-container-6.1.3.tgz#4c2d35f7da4ad000062ff5cc9fda09e32b400632"
   integrity sha512-pZqRRL5Yx2Yy30cdjsNEXRpTfl1WEf640ZLVHX2+fcKcWftPJaIXQZR+0aLvijyWF3VA4O/r/8IxhYgiMkqAUQ==
 
+"@pixi/particle-emitter@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@pixi/particle-emitter/-/particle-emitter-5.0.2.tgz#29e77d2c63c3cb24191edfb7903941606f439681"
+  integrity sha512-PNG2AveL2meWLY53Fy83C2s0ybF1/xyOvx+L68wgdVw3r4ZkObuKeWSfsI7dO4EUUuayKd+5vU/vfjU+2jVbng==
+
 "@pixi/polyfill@6.1.3":
   version "6.1.3"
   resolved "https://registry.yarnpkg.com/@pixi/polyfill/-/polyfill-6.1.3.tgz#3bb1025de2c98c56a86ae46281286e38a4300f01"

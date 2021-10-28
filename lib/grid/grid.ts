@@ -1,4 +1,5 @@
 import {
+  BoundingBox,
   createHexPrototype,
   Grid,
   Hex,
@@ -36,6 +37,8 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
   readonly moistureSettings: IMoistureSettings;
   readonly contourSettings: FixedLengthArray<number, 5>;
   private readonly elevationNoise: SimplexNoise;
+  private readonly qtyHexesX: number;
+  private readonly qtyHexesY: number;
 
   constructor(settings: IGridSettings) {
     const hexPrototype = createHexPrototype<N>({
@@ -45,6 +48,8 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
     const transverser = spiral<N>({ start: [0, 0], radius: 20 });
     super(hexPrototype, transverser);
 
+    this.qtyHexesX = (settings.dimensions as BoundingBox).width * 2 + 1;
+    this.qtyHexesY = (settings.dimensions as BoundingBox).height * 2 + 1;
     this.viewDistance = settings.viewDistance;
     this.elevationSettings = settings.elevation;
     this.moistureSettings = settings.moisture;
@@ -81,17 +86,22 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
   elevation() {
     this.filter((tile) => !tile.terrain)
       .each((tile) => {
-        tile.terrain = this.getTerrainForHex(tile);
+        const e = this.calculateHexElevation(tile.r, tile.q);
+        tile.level = e;
+        tile.terrain = this.getTerrainForHex(e);
       })
       .run();
   }
 
-  private getTerrainForHex(hex: N): Terrains.Terrain {
-    const e = this.calculateHexElevation(hex.x, hex.y);
-    if (e <= 0.2) {
+  private getTerrainForHex(e: number): Terrains.Terrain {
+    if (e < 1) {
       return Terrains.WATER;
-    } else if (e <= 0.8) {
+    } else if (e < 2) {
+      return Terrains.SAND;
+    } else if (e < 5) {
       return Terrains.FIELD;
+    } else if (e < 6) {
+      return Terrains.DIRT;
     } else {
       return Terrains.MOUNTAIN;
     }
@@ -100,17 +110,20 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
   private calculateHexElevation(x: number, y: number) {
     const { octave0, octave1, octave2, octave3, redistribution } =
       this.elevationSettings;
+    const nx: number = x / this.qtyHexesX - 0.5;
+    const ny: number = y / this.qtyHexesY - 0.5;
     let e: number =
-      octave0 * this.elevationNoise.noise2D(x, y) +
-      octave1 * this.elevationNoise.noise2D(4 * x, 4 * y) +
-      octave2 * this.elevationNoise.noise2D(8 * x, 8 * y) +
-      octave3 * this.elevationNoise.noise2D(16 * x, 16 * y);
-    e = (e + 1) / 2; // from -1 to 1  --> from 0 to 1
+      octave0 * this.elevationNoise.noise2D(nx, ny) +
+      octave1 * this.elevationNoise.noise2D(4 * nx, 4 * ny) +
+      octave2 * this.elevationNoise.noise2D(8 * nx, 8 * ny) +
+      octave3 * this.elevationNoise.noise2D(16 * nx, 16 * ny);
+    // e = (e + 1) / 2; // from -1 to 1  --> from 0 to 1
 
     if (e < 0) e = 0;
     if (e > 1) e = 1;
 
-    const redistributed = Math.pow(e, redistribution);
+    // const redistributed = Math.pow(e, redistribution);
+    const redistributed = Math.round(e * 7);
 
     return redistributed;
   }
@@ -128,7 +141,7 @@ export function generateGrid(settings?: Partial<IGridSettings>): HexGrid<Node> {
     contour: [0.2, 0.3, 0.5, 0.7, 0.9],
     elevation: {
       createIsland: false,
-      seed: 'fdc9a9ca516c78d1f830948badf1875d88424406',
+      seed: 'fdc9a9ca516c78d1f830948badf1875d88424407',
       frequency: 0.8,
       redistribution: 1.0,
       octave0: 1,
@@ -150,7 +163,7 @@ export function generateGrid(settings?: Partial<IGridSettings>): HexGrid<Node> {
   const s = { ...defaultSettings, ...settings };
   const grid = new HexGrid(s);
   grid.elevation();
-  grid.fov([4, 3]);
+  grid.fov([3, 3]);
 
   return grid;
 }
