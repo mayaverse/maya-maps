@@ -31,6 +31,7 @@ export interface IGrid {
   moistureSettings: IMoistureSettings;
   contourSettings: FixedLengthArray<number, 5>;
   size: number;
+  playerLocation: HexCoordinates | undefined;
 }
 
 export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
@@ -42,6 +43,10 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
   readonly qtyHexesX: number;
   readonly qtyHexesY: number;
   readonly size: number;
+  private player?: HexCoordinates;
+  public get playerLocation(): HexCoordinates | undefined {
+    return this.player;
+  }
 
   constructor(settings: IGridSettings) {
     const hexPrototype = createHexPrototype<N>({
@@ -62,25 +67,32 @@ export class HexGrid<N extends INode & Hex> extends Grid<N> implements IGrid {
   }
 
   fov(start: HexCoordinates) {
-    this.traverse(
-      rays({
-        start,
-        length: this.viewDistance,
-        updateRay: (ray) => {
-          const result = ray.reduce(
-            (state, tile) => {
-              if (!state.opaque && tile.terrain) {
-                state.tiles.push(tile);
-                state.opaque = tile.terrain.opaque;
-              }
-              return state;
-            },
-            { opaque: false, tiles: [] as Array<N> }
-          );
-          return result.tiles;
-        },
-      })
-    )
+    this.player = start;
+    this
+      // .each((tile) => {
+      //   if (tile.visibility === 'visible') {
+      //     tile.visibility = 'discovered';
+      //   }
+      // })
+      .traverse(
+        rays({
+          start,
+          length: this.viewDistance,
+          updateRay: (ray) => {
+            const result = ray.reduce(
+              (state, tile) => {
+                if (!state.opaque && tile.terrain) {
+                  state.tiles.push(tile);
+                  state.opaque = tile.terrain.opaque;
+                }
+                return state;
+              },
+              { opaque: false, tiles: [] as Array<N> }
+            );
+            return result.tiles;
+          },
+        })
+      )
       .each((tile) => {
         tile.visibility = 'visible';
       })
@@ -146,7 +158,8 @@ export function generateGrid(settings?: Partial<IGridSettings>): HexGrid<Node> {
     contour: [0.2, 0.3, 0.5, 0.7, 0.9],
     elevation: {
       createIsland: false,
-      seed: 'adc9a9ca51217841f830942badf1675d8s424415',
+      seed: 'adc9a9ca51217841f830342badf1675d8se24415',
+      // seed: '0x9708416338Ff224fDCA6b61C84460c4239c5Cb57', //'adc9a9ca51217841f830342badf1675d8se24415',
       frequency: 0.8,
       redistribution: 1.0,
       octave0: 1,
@@ -168,7 +181,6 @@ export function generateGrid(settings?: Partial<IGridSettings>): HexGrid<Node> {
   const s = { ...defaultSettings, ...settings };
   const grid = new HexGrid(s);
   grid.elevation();
-  grid.fov([3, 3]);
 
   return grid;
 }

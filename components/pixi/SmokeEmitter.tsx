@@ -28,6 +28,7 @@ const SmokeEmitter = PixiComponent<SmokeEmitterProps, EmitContainer>(
   {
     create: (config) => {
       const container = new EmitContainer();
+      container.mask = config.mask || null;
       container.emitter = new Emitter(container, { ...dc, ...config });
       return container;
     },

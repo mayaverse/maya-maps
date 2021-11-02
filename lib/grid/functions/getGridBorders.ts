@@ -34,6 +34,5 @@ export function getGridBorders(grid?: HexGrid<Node>): Point[] {
       }
     })
     .run();
-  console.log('borders', borders);
   return borders;
 }

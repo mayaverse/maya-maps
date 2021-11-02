@@ -13,7 +13,6 @@ const RegionBorder = PixiComponent<RegionBorderProps, Graphics>(
     applyProps: (graphics, _, props) => {
       const { corners } = props;
       const color = 0x999999;
-
       if (corners.length > 0) {
         graphics.lineStyle(5, color);
 

@@ -1,9 +1,9 @@
 import { Container, PixiRef, Stage } from '@inlet/react-pixi';
 import { IApplicationOptions } from '@pixi/app';
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { getGridBorders } from '../../lib/grid/functions/getGridBorders';
-import { useHexGrid } from '../../lib/hooks/useHexGrid';
+import { useHexGrid, usePlayerLocation } from '../../lib/hooks/useHexGrid';
 import useResize from '../../lib/hooks/useResize';
 import SmokeEmitter from '../pixi/SmokeEmitter';
 import HexagonTile from './HexagonTile';
@@ -23,11 +23,20 @@ const stageOptions: IApplicationOptions = {
 
 const HexMap = () => {
   const viewportRef = useRef<IPixiViewport>(null);
-  const borderRef = useRef<IRegionBorder>(null);
-  const maskRef = useRef<IRegionMask>(null);
+  const [mask, setMask] = React.useState<IRegionMask>();
   const { width, height } = useResize();
   const grid = useHexGrid();
-  const gridBorder = useMemo(() => getGridBorders(grid), [grid]);
+  const { setPlayerLocation } = usePlayerLocation();
+  const { gridBorder, hexes } = useMemo(() => {
+    console.log('grid changed');
+    return { gridBorder: getGridBorders(grid), hexes: grid?.hexes() || [] };
+  }, [grid]);
+  const handleClick = useCallback(
+    (q, r) => {
+      setPlayerLocation && setPlayerLocation(q, r);
+    },
+    [setPlayerLocation]
+  );
 
   return (
     <Stage width={width} height={height} options={stageOptions}>
@@ -60,14 +69,21 @@ const HexMap = () => {
           maxScale: 2,
         }}
       >
-        <SmokeEmitter play mask={maskRef.current} />
-        <RegionMask corners={gridBorder} ref={maskRef} />
+        <SmokeEmitter play mask={mask} />
+        <RegionMask
+          corners={gridBorder}
+          ref={(ref) => setMask(ref || undefined)}
+        />
         <Container sortableChildren>
-          {grid?.hexes().map((node) => (
-            <HexagonTile key={node.toString()} node={node} />
+          {hexes.map((node) => (
+            <HexagonTile
+              key={node.toString()}
+              node={node}
+              onClick={() => handleClick(node.q, node.r)}
+            />
           ))}
         </Container>
-        <RegionBorder corners={gridBorder} ref={borderRef} />
+        <RegionBorder corners={gridBorder} />
       </PixiViewport>
     </Stage>
   );

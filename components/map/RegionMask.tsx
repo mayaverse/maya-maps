@@ -6,7 +6,7 @@ interface RegionMaskProps {
   corners: Point[];
 }
 
-const RegionMask = PixiComponent<RegionMaskProps, Graphics>('RegionBorder', {
+const RegionMask = PixiComponent<RegionMaskProps, Graphics>('RegionMask', {
   create: () => new Graphics(),
   applyProps: (graphics, _, props) => {
     const { corners } = props;
